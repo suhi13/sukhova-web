@@ -5,25 +5,22 @@ node ('ec2-builder'){
     def appRepositoryUrl = "https://github.com/shopizer-ecommerce/shopizer.git"
 
     stage('Git checkout') {
-        checkout scm
-        dir('api') {
-            checkout([
-                $class: "GitSCM",
-                doGenerateSubmoduleConfigurations: false, 
-                submoduleCfg: [],       
-                userRemoteConfigs:[
-                    [
-                        url: appRepositoryUrl
-                    ]
-                ],
-                branches:[[ name:"master"]]
-            ])
-        }
+        checkout([
+            $class: "GitSCM",
+            doGenerateSubmoduleConfigurations: false, 
+            submoduleCfg: [],       
+            userRemoteConfigs:[
+                [
+                    url: appRepositoryUrl
+                ]
+            ],
+            branches:[[ name:"master"]]
+        ])
     }
 
     stage('Build Maven') {
         docker.image("maven:3.8.1-adoptopenjdk-11").inside() {
-            dir('api/shopizer') {
+            dir('shopizer') {
                 sh "mvn clean install"
             }
         }

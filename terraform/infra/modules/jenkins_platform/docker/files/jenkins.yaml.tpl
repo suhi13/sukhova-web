@@ -84,14 +84,14 @@ jenkins:
                     provider: ${ec2_capacity_provider}
                     weight: 0
                 containerUser: "root"
-                cpu: 1024
+                cpu: 2000
                 defaultCapacityProvider: false
                 executionRole: ${execution_role_arn}
                 image: ${ec2builder_image}
                 label: "ec2-builder"
                 launchType: "EC2"
                 memory: 0
-                memoryReservation: 2000
+                memoryReservation: 4000
                 mountPoints:
                   - containerPath: "/var/run/docker.sock"
                     name: "Docker"
