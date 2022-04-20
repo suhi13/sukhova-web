@@ -84,14 +84,14 @@ jenkins:
                     provider: ${ec2_capacity_provider}
                     weight: 0
                 containerUser: "root"
-                cpu: 2000
+                cpu: 0
                 defaultCapacityProvider: false
                 executionRole: ${execution_role_arn}
                 image: ${ec2builder_image}
                 label: "ec2-builder"
                 launchType: "EC2"
                 memory: 0
-                memoryReservation: 4000
+                memoryReservation: 1000
                 mountPoints:
                   - containerPath: "/var/run/docker.sock"
                     name: "Docker"
@@ -115,56 +115,17 @@ security:
     port: -1
 jobs:
   - script: >
-      pipelineJob('Simple job critical task') {
+      pipelineJob('sukhova-shopizer') {
         definition {
-          cps {
-            script('''
-              pipeline {
-                  agent {
-                      ecs {
-                          inheritFrom 'build-example'
-                      }
-                  }
-                  stages {
-                    stage('Test') {
-                        steps {
-                            script {
-                                sh "echo this was executed on non spot instance"
-                            }
-                            sh 'sleep 120'
-                            sh 'echo sleep is done'
-                        }
-                    }
-                  }
-              }'''.stripIndent())
-              sandbox()
-          }
-        }
-      }
-  - script: >
-      pipelineJob('Simple job non critical task') {
-        definition {
-          cps {
-            script('''
-              pipeline {
-                  agent {
-                      ecs {
-                          inheritFrom 'build-example-spot'
-                      }
-                  }
-                  stages {
-                    stage('Test') {
-                        steps {
-                            script {
-                                sh "echo this was executed on a spot instance"
-                            }
-                            sh 'sleep 120'
-                            sh 'echo sleep is done'
-                        }
-                    }
-                  }
-              }'''.stripIndent())
-              sandbox()
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/suhi13/sukhova-web.git') }
+                branches('development')
+                scriptPath('jobs/shopizer/Jenkinsfile')
+                extensions { }
+              }
+            }
           }
         }
       }
