@@ -1,0 +1,84 @@
+#!groovy
+
+node ('ec2-builder'){
+    //currentBuild.displayName = "#${BUILD_NUMBER}"
+    def appRepositoryUrl = "https://github.com/shopizer-ecommerce/shopizer.git"
+
+    stage('Git checkout') {
+        checkout scm
+        dir('api') {
+            checkout([
+                $class: "GitSCM",
+                doGenerateSubmoduleConfigurations: false, 
+                submoduleCfg: [],       
+                userRemoteConfigs:[
+                    [
+                        url: appRepositoryUrl
+                    ]
+                ],
+                branches:[[ name:"master"]]
+            ])
+        }
+    }
+
+    stage('Build Maven') {
+        docker.image("maven:3.8.1-adoptopenjdk-11").inside() {
+            dir('api/shopizer') {
+                sh "mvn clean install"
+            }
+        }
+    }
+    /*
+    stage('Build image') {
+    }
+    
+    
+    stage('Push image') {
+    }
+
+*/
+
+/*
+    stage('SonarQube analysis') {
+        sh 'echo Run SAST - SonarQube analysis'
+        def scannerHome = tool 'sonar_scanner';
+        withSonarQubeEnv() {
+            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=myapp"
+        }
+    }
+	
+    stage("SonarQube Quality Gate") {
+        waitForQualityGate abortPipeline: true
+    }
+
+    stage('Build Image') {
+        sh 'echo Build application image'
+        app = docker.build("repo/image ", "./<путь к Dockerfile> ")
+    }
+
+    stage('Push image to Docker Hub') {
+        sh 'echo Push image to a Docker Hub'
+        docker.withRegistry('https://registry.hub.docker.com', 'docker_id') {
+            app.push("latest") 
+        }
+    }
+
+
+    stage('OWASP ZAP analysis') {
+        sh 'echo Run DAST - OWASP ZAP analysis'
+        sh "docker run -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.0.197 || true"
+    }
+
+    stage ('Generate BOM') {
+        steps {
+            sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom'
+        }
+    }
+    stage ('Dependency Tracker') {
+        steps {
+            dependencyTrackPublisher artifact: 'target/bom.xml', projectId: '9812e933-6bc1-4453-951f-9a75a7d693d4', synchronous: true
+        }
+    }
+/*    
+}
+
