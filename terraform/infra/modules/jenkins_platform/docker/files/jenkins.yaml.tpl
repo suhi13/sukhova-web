@@ -1,5 +1,5 @@
 jenkins:
-    systemMessage: "Amazon Fargate Demo"
+    systemMessage: "Amazon Fargate"
     numExecutors: 0
     remotingSecurity:
       enabled: true
@@ -86,7 +86,7 @@ jenkins:
                 containerUser: "root"
                 cpu: 1024
                 defaultCapacityProvider: false
-                executionRole: ${AGENT_EXECUTION_ROLE_ARN}
+                executionRole: ${execution_role_arn}
                 image: ${ec2builder_image}
                 label: "ec2-builder"
                 launchType: "EC2"
@@ -107,8 +107,7 @@ jenkins:
                 remoteFSRoot: "/home/jenkins"
                 securityGroups: ${agent_security_groups}
                 sharedMemorySize: 0
-                subnets: ${tf_subnets}
-                taskRole: ${AGENT_EXECUTION_ROLE_ARN}
+                subnets: ${subnets}
                 templateName: "ec2-builder"
                 uniqueRemoteFSRoot: false
 security:

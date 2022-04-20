@@ -5,6 +5,11 @@ variable jenkins_ecr_repository_name {
   description = "Name for Jenkins controller ECR repository"
 }
 
+variable "jenkins_agent_ecr_repository_name" {
+  type        = string
+  default     = "jenkins-agent"
+  description = "Name for Jenkins agent ECR repository"
+}
 
 variable name_prefix {
   type    = string

@@ -28,7 +28,6 @@ node ('ec2-builder'){
             }
         }
     }
-    /*
     stage('Build image') {
     }
     
@@ -36,7 +35,6 @@ node ('ec2-builder'){
     stage('Push image') {
     }
 
-*/
 
 /*
     stage('SonarQube analysis') {
@@ -79,6 +77,6 @@ node ('ec2-builder'){
             dependencyTrackPublisher artifact: 'target/bom.xml', projectId: '9812e933-6bc1-4453-951f-9a75a7d693d4', synchronous: true
         }
     }
-/*    
+*/    
 }
 
