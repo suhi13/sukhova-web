@@ -20,10 +20,7 @@ node ('ec2-builder'){
 
     stage('Build Maven') {
         docker.image("maven:3.8.1-adoptopenjdk-11").inside() {
-            sh 'ls -l'
-            dir('shopizer') {
-                sh "mvn clean install"
-            }
+            sh "mvn clean install"
         }
     }
     stage('Build image') {
