@@ -33,6 +33,7 @@ node ('ec2-builder'){
 */
 
     stage('Terraform deploy') {
+        sh 'ls -l'
         dir('terraform/app') {
             terraformPerform('apply')
         }
