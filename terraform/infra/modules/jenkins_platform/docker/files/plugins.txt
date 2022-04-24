@@ -59,6 +59,7 @@ matrix-auth:3.1
 matrix-project:758.v7a_ea_491852f3
 momentjs:1.1.1
 okhttp-api:4.9.3-105.vb96869f8ac3a
+pipeline-aws:1.43
 pipeline-build-step:2.17
 pipeline-github-lib:36.v4c01db_ca_ed16
 pipeline-graph-analysis:188.v3a01e7973f2c

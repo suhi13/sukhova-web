@@ -59,11 +59,11 @@ node ('ec2-builder'){
     }
 
 /*
-    stage('Build Frontend') {
+    stage('Build/Push Frontend') {
         def repositoryName  = "shopizer-frontend"
-        def dockerImageName = "${dockerEcr}/${repositoryName}"        
+        def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"        
         dir('fe') {
-            app = docker.build(dockerImageName, "./")
+            def image = docker.build(dockerImageName, "./")
         }
     }
 */
@@ -110,6 +110,8 @@ def terraformPerform(action) {
 }
 
 def pushImage(image) {
-    sh("set +x; eval \$(aws ecr get-login --region=eu-central-1 --no-include-email | sed 's|https://||')")
-    image.push()
+    withAWS(useNode: true) {    
+        sh("set +x; eval \$(aws ecr get-login --region=eu-central-1 --no-include-email | sed 's|https://||')")
+        image.push()
+    }
 }
