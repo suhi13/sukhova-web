@@ -43,8 +43,7 @@ node ('ec2-builder'){
 
     stage('Build/Push API') {
         def repositoryName  = "shopizer-api"
-        def dockerImageName = "${dockerEcr}/${repositoryName}"
-        def app        
+        def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"
 
         docker.image(mavenImage).inside() {
             dir('api'){
@@ -53,8 +52,9 @@ node ('ec2-builder'){
         }
 
         docker.withRegistry("https://${dockerEcr}", "ecr:eu-central-1:${repositoryName}") {
-            app = docker.build(dockerImageName, "./sm-shop")
-            app.push(env.BUILD_ID) 
+            def image = docker.build(dockerImageName, "./sm-shop")
+            pushImage(image)
+            //app.push() 
         }
     }
 
