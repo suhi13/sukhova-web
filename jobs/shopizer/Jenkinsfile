@@ -6,7 +6,8 @@ node ('ec2-builder'){
     def feRepositoryUrl         = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
     def terraformRepositoryUrl  = "https://github.com/suhi13/sukhova-web.git"
     def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
-    def dockerEcr               = "623550112002.dkr.ecr.eu-central-1.amazonaws.com"
+    def awsRegion               = "eu-central-1"
+    def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
     
     stage('Git checkout') {
         dir('api') {
@@ -23,8 +24,10 @@ node ('ec2-builder'){
 /*
     stage('SonarQube analysis') {
         def scannerHome = tool 'SonarScanner 4.0';
-        withSonarQubeEnv() {
-            sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=myapp"
+        dir('api') {
+            withSonarQubeEnv() {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api"
+            }
         }
     }
 	
