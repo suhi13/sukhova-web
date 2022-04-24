@@ -45,16 +45,12 @@ node ('ec2-builder'){
         def repositoryName  = "shopizer-api"
         def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"
 
-        docker.image(mavenImage).inside() {
-            dir('api'){
+        dir('api'){
+            docker.image(mavenImage).inside() {
                 sh "mvn clean install"
             }   
-        }
-
-        docker.withRegistry("https://${dockerEcr}", "ecr:eu-central-1:${repositoryName}") {
             def image = docker.build(dockerImageName, "./sm-shop")
             pushImage(image)
-            //app.push() 
         }
     }
 
@@ -64,6 +60,7 @@ node ('ec2-builder'){
         def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"        
         dir('fe') {
             def image = docker.build(dockerImageName, "./")
+            pushImage(image)
         }
     }
 */
@@ -98,15 +95,15 @@ def checkoutRepository(repoUrl, branch = 'master') {
 }
 
 def terraformPerform(action) {
-        timeout(time: 1, unit: 'HOURS') {
-            ansiColor('xterm') {
-                timestamps {
-                    sh "terraform init"
-                    sh "terraform validate"
-                    sh "terraform ${action} -auto-approve"
-                }
+    timeout(time: 1, unit: 'HOURS') {
+        ansiColor('xterm') {
+            timestamps {
+                sh "terraform init"
+                sh "terraform validate"
+                sh "terraform ${action} -auto-approve"
             }
         }
+    }
 }
 
 def pushImage(image) {
