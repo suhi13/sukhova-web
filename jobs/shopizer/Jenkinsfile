@@ -45,13 +45,15 @@ node ('ec2-builder'){
         def repositoryName  = "shopizer-api"
         def dockerImageName = "${dockerEcr}/${repositoryName}"
         def app        
+
         docker.image(mavenImage).inside() {
             dir('api'){
                 sh "mvn clean install"
-                app = docker.build(dockerImageName, "./sm-shop")
-            }
+            }   
         }
+
         docker.withRegistry("https://${dockerEcr}", "ecr:eu-central-1:${repositoryName}") {
+            app = docker.build(dockerImageName, "./sm-shop")
             app.push(env.BUILD_ID) 
         }
     }

@@ -4,7 +4,6 @@
 data "aws_iam_policy_document" "jenkins_slave_policy" {
   statement {
     actions = ["sts:AssumeRole"]
-
     principals {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
@@ -20,6 +19,11 @@ resource "aws_iam_role" "jenkins_slave_role" {
 resource "aws_iam_role_policy_attachment" "jenkins_slave_policy_attachment" {
   role       = aws_iam_role.jenkins_slave_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins_slave_admin_policy_attachment" {
+  role       = aws_iam_role.jenkins_slave_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 resource "aws_iam_instance_profile" "jenkins_slave_profile" {
