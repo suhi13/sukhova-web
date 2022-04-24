@@ -2,13 +2,12 @@
 
 node ('ec2-builder'){
     //currentBuild.displayName = "#${BUILD_NUMBER}"
-    def apiRepositoryUrl    = "https://github.com/shopizer-ecommerce/shopizer.git"
-    def feRepositoryUrl     = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
-    def mavenImage          = "maven:3.8.1-adoptopenjdk-11"
-    def branch              = "master"
-    def dockerEcr           = "623550112002.dkr.ecr.eu-central-1.amazonaws.com"
-    def apiImage
-    def frontendImage
+    def apiRepositoryUrl        = "https://github.com/shopizer-ecommerce/shopizer.git"
+    def feRepositoryUrl         = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
+    def terraformRepositoryUrl  = "https://github.com/suhi13/sukhova-web.git"
+    def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
+    def branch                  = "master"
+    def dockerEcr               = "623550112002.dkr.ecr.eu-central-1.amazonaws.com"
     
     stage('Git checkout') {
         dir('api') {
@@ -16,6 +15,9 @@ node ('ec2-builder'){
         }
         dir('fe') {
             checkoutRepository(feRepositoryUrl, branch)
+        }
+        dir('infra') {
+            checkoutRepository(terraformRepositoryUrl, 'development')
         }
     }
 
@@ -33,8 +35,7 @@ node ('ec2-builder'){
 */
 
     stage('Terraform deploy') {
-        sh 'ls -l'
-        dir('terraform/app') {
+        dir('infra/terraform/app') {
             terraformPerform('apply')
         }
     }
