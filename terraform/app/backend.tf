@@ -2,7 +2,8 @@ terraform {
   required_version = ">= 0.13"
   backend "s3" {
     bucket  = "tf-sukhova-20220401"
-    key     = "infra.tfstate"
+    key     = "app"
+    encrypt = true
     region  = "eu-central-1"
   }
 }
@@ -10,3 +11,4 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+

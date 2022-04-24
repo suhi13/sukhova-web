@@ -28,6 +28,7 @@ configuration-as-code:1414.v878271fc496f
 configuration-as-code-support:1.19
 credentials:2.6.1.1
 credentials-binding:1.27.1
+dependency-check-jenkins-plugin:5.1.2
 dependency-track:4.1.1
 display-url-api:2.3.5
 docker-commons:1.19

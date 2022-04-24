@@ -23,7 +23,6 @@ resource "aws_ecr_repository" "jenkins_agent" {
   image_scanning_configuration {
     scan_on_push = true
   }
-
 }
 
 data "template_file" jenkins_configuration_def {

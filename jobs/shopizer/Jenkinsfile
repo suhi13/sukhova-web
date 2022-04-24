@@ -2,25 +2,26 @@
 
 node ('ec2-builder'){
     //currentBuild.displayName = "#${BUILD_NUMBER}"
-    def appRepositoryUrl = "https://github.com/shopizer-ecommerce/shopizer.git"
-    def branch = "master"
+    def apiRepositoryUrl    = "https://github.com/shopizer-ecommerce/shopizer.git"
+    def feRepositoryUrl     = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
+    def mavenImage          = "maven:3.8.1-adoptopenjdk-11"
+    def branch              = "master"
+    def dockerEcr           = "623550112002.dkr.ecr.eu-central-1.amazonaws.com"
+    def apiImage
+    def frontendImage
+    
     stage('Git checkout') {
-        checkout([
-            $class: "GitSCM",
-            doGenerateSubmoduleConfigurations: false, 
-            submoduleCfg: [],       
-            userRemoteConfigs:[
-                [
-                    url: appRepositoryUrl
-                ]
-            ],
-            branches:[[ name: branch]]
-        ])
+        dir('api') {
+            checkoutRepository(apiRepositoryUrl, branch)
+        }
+        dir('fe') {
+            checkoutRepository(feRepositoryUrl, branch)
+        }
     }
 
 /*
     stage('SonarQube analysis') {
-        def scannerHome = tool 'sonar_scanner';
+        def scannerHome = tool 'SonarScanner 4.0';
         withSonarQubeEnv() {
             sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=myapp"
         }
@@ -31,23 +32,39 @@ node ('ec2-builder'){
     }
 */
 
-
-    stage('Build Maven') {
-        docker.image("maven:3.8.1-adoptopenjdk-11").inside() {
-            sh "mvn clean install"
+    stage('Terraform deploy') {
+        dir('terraform/app') {
+            terraformPerform('apply')
         }
     }
 
-    stage('Build Image') {
-        app = docker.build("testingz/shopizer", "./sm-shop")
+
+    stage('Build/Push API') {
+        def repositoryName  = "shopizer-api"
+        def dockerImageName = "${dockerEcr}/${repositoryName}"
+        def app        
+        docker.image(mavenImage).inside() {
+            dir('api'){
+                sh "mvn clean install"
+                app = docker.build(dockerImageName, "./sm-shop")
+            }
+        }
+        docker.withRegistry("https://${dockerEcr}", "ecr:eu-central-1:${repositoryName}") {
+            app.push(env.BUILD_ID) 
+        }
     }
+
 /*
-    stage('Push image to Docker Hub') {
-        docker.withRegistry('https://registry.hub.docker.com', 'docker_id') {
-            app.push("latest") 
+    stage('Build Frontend') {
+        def repositoryName  = "shopizer-frontend"
+        def dockerImageName = "${dockerEcr}/${repositoryName}"        
+        dir('fe') {
+            app = docker.build(dockerImageName, "./")
         }
     }
+*/
 
+/*
     stage('OWASP ZAP analysis') {
         sh "docker run -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.0.197 || true"
     }
@@ -62,3 +79,33 @@ node ('ec2-builder'){
 */    
 }
 
+def checkoutRepository(repoUrl, branch = 'master') {
+    checkout([
+        $class: "GitSCM",
+        doGenerateSubmoduleConfigurations: false, 
+        submoduleCfg: [],       
+        userRemoteConfigs:[
+            [
+                url: repoUrl
+            ]
+        ],
+        branches:[[ name: branch]]
+    ])
+}
+
+def terraformPerform(action) {
+        timeout(time: 1, unit: 'HOURS') {
+            ansiColor('xterm') {
+                timestamps {
+                    sh "terraform init"
+                    sh "terraform validate"
+                    sh "terraform ${action} -auto-approve"
+                }
+            }
+        }
+}
+
+def pushImage(image) {
+    sh("set +x; eval \$(aws ecr get-login --region=eu-central-1 --no-include-email | sed 's|https://||')")
+    image.push()
+}

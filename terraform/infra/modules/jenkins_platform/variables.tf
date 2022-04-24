@@ -1,4 +1,3 @@
-
 variable jenkins_ecr_repository_name {
   type        = string
   default     = "serverless-jenkins-controller"
@@ -180,12 +179,12 @@ variable jenkins_jnlp_port {
 
 variable jenkins_controller_cpu {
   type    = number
-  default = 2048
+  default = 1024
 }
 
 variable jenkins_controller_memory {
   type    = number
-  default = 4096
+  default = 2048
 }
 
 variable jenkins_controller_task_log_retention_days {
@@ -224,7 +223,7 @@ variable route53_zone_id {
 
 variable route53_alias_name {
   type    = string
-  default = "jenkins-controller"
+  default = "jenkins"
 }
 
 variable tags {
@@ -242,4 +241,9 @@ variable "sonarqube_image" {
 variable "slave_instance_type" {
   description = "The instance type for Jenkins slave"
   default     = "t3.medium"
+}
+
+variable route53_sonar_alias_name {
+  type    = string
+  default = "sonar"
 }

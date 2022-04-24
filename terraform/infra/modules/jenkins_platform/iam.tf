@@ -220,6 +220,7 @@ data "aws_iam_policy_document" jenkins_controller_task_policy {
       "ecr:GetAuthorizationToken",
       "ecs:RegisterTaskDefinition",
       "ecs:ListClusters",
+      "ecs:DescribeClusters",
       "ecs:DescribeContainerInstances",
       "ecs:ListTaskDefinitions",
       "ecs:DescribeTaskDefinition",

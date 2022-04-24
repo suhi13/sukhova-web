@@ -6,21 +6,12 @@
       "memory": ${memory},
       "memoryReservation": ${memory},
       "environment": [
-        { "name" : "JAVA_OPTS", "value" : "-Djenkins.install.runSetupWizard=false" }
+        { "name" : "JAVA_OPTS", "value" : "-Dsonar.search.javaAdditionalOpts=-Dnode.store.allow_mmap=false" }
       ],
       "essential": true,
-      "mountPoints": [
-        {
-          "containerPath": "${jenkins_home}",
-          "sourceVolume": "${source_volume}"
-        }
-      ],
       "portMappings": [
         {
-          "containerPort": ${jenkins_controller_port}
-        },
-        {
-          "containerPort": ${jnlp_port}
+          "containerPort": ${sonar_port}
         }
       ],
       "logConfiguration": {
@@ -28,7 +19,7 @@
         "options": {
             "awslogs-group": "${log_group}",
             "awslogs-region": "${region}",
-            "awslogs-stream-prefix": "controller"
+            "awslogs-stream-prefix": "sonar"
         }
       },
       "secrets": [
