@@ -54,7 +54,7 @@ node ('ec2-builder'){
         }
     }
 
-/*
+
     stage('Build/Push Frontend') {
         def repositoryName  = "shopizer-frontend"
         def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"        
@@ -63,7 +63,6 @@ node ('ec2-builder'){
             pushImage(image)
         }
     }
-*/
 
 /*
     stage('OWASP ZAP analysis') {
