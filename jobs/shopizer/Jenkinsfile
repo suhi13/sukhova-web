@@ -39,7 +39,6 @@ node ('ec2-builder'){
         }
     }
 
-/*
     stage('Build/Push API') {
         def repositoryName  = "shopizer-api"
         def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"
@@ -52,13 +51,11 @@ node ('ec2-builder'){
             pushImage(image)
         }
     }
-*/
 
     stage('Build/Push Frontend') {
         def repositoryName  = "shopizer-frontend"
         def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"        
         dir('fe') {
-            sh 'ls -l'
             def image = docker.build(dockerImageName, "./")
             pushImage(image)
         }
@@ -84,11 +81,7 @@ def checkoutRepository(repoUrl, branch = 'master') {
         $class: "GitSCM",
         doGenerateSubmoduleConfigurations: false, 
         submoduleCfg: [],       
-        userRemoteConfigs:[
-            [
-                url: repoUrl
-            ]
-        ],
+        userRemoteConfigs:[[ url: repoUrl ]],
         branches:[[ name: branch]]
     ])
 }
