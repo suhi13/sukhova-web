@@ -113,6 +113,33 @@ jenkins:
 security:
   sSHD:
     port: -1
+unclassified:
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: true
+    installations:
+    - credentialsId: "sonar_token"
+      name: "SonarQube"
+      serverUrl: "https://sonar.rootin.cc"
+      triggers:
+        skipScmCause: false
+        skipUpstreamCause: false
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - string:
+          id: "sonar_token"
+          scope: GLOBAL
+          secret: "{AQAAABAAAAAwjng==}"
+tool:
+  sonarRunnerInstallation:
+    installations:
+    - name: "sonar_scanner"
+      properties:
+      - installSource:
+          installers:
+          - sonarRunnerInstaller:
+              id: "4.7.0.2747"          
 jobs:
   - script: >
       pipelineJob('sukhova-shopizer') {

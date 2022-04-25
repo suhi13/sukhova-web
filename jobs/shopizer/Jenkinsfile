@@ -29,7 +29,7 @@ node ('ec2-builder'){
         def scannerHome = tool 'sonar_scanner';
         dir('api') {
             withSonarQubeEnv('SonarQube') {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api"
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api -Dsonar.java.binaries=target"
             }
         }
     }
