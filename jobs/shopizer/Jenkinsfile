@@ -28,7 +28,7 @@ node ('ec2-builder'){
     stage('SonarQube analysis') {
         def scannerHome = tool 'sonar_scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation';
         dir('api') {
-            withSonarQubeEnv('sonar_scanner') {
+            withSonarQubeEnv('SonarQube') {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api"
             }
         }
