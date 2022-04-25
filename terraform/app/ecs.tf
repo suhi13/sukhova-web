@@ -89,8 +89,8 @@ resource "aws_service_discovery_private_dns_namespace" "app" {
 module "task-definition-api" {
   source          = "cn-terraform/ecs-fargate-task-definition/aws"
   name_prefix     = "${var.name_prefix}-api"
-  container_name  = "${var.name_prefix}-api:${var.image_tag}"
-  container_image = aws_ecr_repository.api.repository_url
+  container_name  = "${var.name_prefix}-api"
+  container_image = "${aws_ecr_repository.api.repository_url}:${var.image_tag}"
 }
 
 #------------------------------------------------------------------------------
