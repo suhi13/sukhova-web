@@ -8,7 +8,7 @@ node ('ec2-builder'){
     def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
     def awsRegion               = "eu-central-1"
     def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
-    def imageTag                = "latest"
+    def imageTag                = env.BUILD_NUMBER
     def varsMap = [
         image_tag: imageTag
     ]
