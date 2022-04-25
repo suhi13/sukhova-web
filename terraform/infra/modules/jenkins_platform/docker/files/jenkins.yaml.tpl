@@ -119,7 +119,7 @@ unclassified:
     installations:
     - credentialsId: "sonar_token"
       name: "SonarQube"
-      serverUrl: "https://sonar.rootin.cc"
+      serverUrl: "http://infra.sonar:9000"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false

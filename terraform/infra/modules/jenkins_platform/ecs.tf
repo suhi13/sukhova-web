@@ -117,8 +117,8 @@ resource "aws_ecs_service" jenkins_controller {
 
 
 resource "aws_service_discovery_private_dns_namespace" "controller" {
-  name = var.name_prefix
-  vpc = var.vpc_id
+  name        = "infra"
+  vpc         = var.vpc_id
   description = "Serverless Jenkins discovery managed zone."
 }
 
