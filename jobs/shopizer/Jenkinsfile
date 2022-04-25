@@ -8,6 +8,10 @@ node ('ec2-builder'){
     def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
     def awsRegion               = "eu-central-1"
     def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
+    def imageTag                = "latest"
+    def vars = [
+        image_tag: imageTag
+    ]
     
     stage('Git checkout') {
         dir('api') {
@@ -38,13 +42,13 @@ node ('ec2-builder'){
 
     stage('Terraform deploy') {
         dir('infra/terraform/app') {
-            terraformPerform('apply')
+            terraformPerform('apply', vars)
         }
     }
 
     stage('Build/Push API') {
         def repositoryName  = "shopizer-api"
-        def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"
+        def dockerImageName = "${dockerEcr}/${repositoryName}:${imageTag}"
 
         dir('api'){
             docker.image(mavenImage).inside() {
@@ -57,7 +61,7 @@ node ('ec2-builder'){
 
     stage('Build/Push Frontend') {
         def repositoryName  = "shopizer-frontend"
-        def dockerImageName = "${dockerEcr}/${repositoryName}:${env.BUILD_ID}"        
+        def dockerImageName = "${dockerEcr}/${repositoryName}:${imageTag}"        
         dir('fe') {
             def image = docker.build(dockerImageName, "./")
             pushImage(image)
@@ -79,7 +83,7 @@ node ('ec2-builder'){
 */    
 }
 
-def checkoutRepository(repoUrl, branch = 'master') {
+def checkoutRepository(repoUrl, branch) {
     checkout([
         $class: "GitSCM",
         doGenerateSubmoduleConfigurations: false, 
@@ -89,13 +93,17 @@ def checkoutRepository(repoUrl, branch = 'master') {
     ])
 }
 
-def terraformPerform(action) {
+def terraformPerform(action, vars) {
+    String vars = ""
+    ctxVars.each{itemKey,itemValue->
+        vars = vars + " -var '${itemKey}=${itemValue}'"    
+    }
     timeout(time: 1, unit: 'HOURS') {
         ansiColor('xterm') {
             timestamps {
                 sh "terraform init"
                 sh "terraform validate"
-                sh "terraform ${action} -auto-approve"
+                sh "terraform ${action} -auto-approve ${vars}"
             }
         }
     }

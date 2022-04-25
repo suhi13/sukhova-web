@@ -3,15 +3,6 @@ module myip {
   version = "1.0.0"
 }
 
-// Bring your own ACM cert for the Application Load Balancer
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> v2.0"
-  domain_name = "${var.jenkins_dns_alias}.${var.route53_domain_name}"
-  zone_id     = var.route53_zone_id
-  tags = local.tags
-}
-
 // An example of creating a KMS key
 resource "aws_kms_key" "efs_kms_key" {
   description = "KMS key used to encrypt Jenkins EFS volume"
@@ -27,7 +18,7 @@ module "serverless_jenkins" {
   jenkins_controller_subnet_ids   = module.vpc.private_subnets
   alb_subnet_ids                  = module.vpc.public_subnets
   alb_ingress_allow_cidrs         = ["${module.myip.address}/32"]
-  alb_acm_certificate_arn         = module.acm.this_acm_certificate_arn
+  alb_acm_certificate_arn         = var.alb_acm_certificate_arn
   route53_create_alias            = true
   route53_alias_name              = var.jenkins_dns_alias
   route53_zone_id                 = var.route53_zone_id

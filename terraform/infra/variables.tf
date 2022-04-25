@@ -45,3 +45,8 @@ variable jenkins_dns_alias {
   default     = "jenkins"
 }
 
+variable alb_acm_certificate_arn {
+  type        = string
+  description = "The ACM certificate ARN to use for the alb"
+}
+
