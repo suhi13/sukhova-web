@@ -32,13 +32,16 @@ node ('ec2-builder'){
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api -Dsonar.java.binaries=."
             }
         }
+        dir('fe') {
+            withSonarQubeEnv('SonarQube') {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-frontend"
+            }
+        }
     }
 	
-/*
     stage("SonarQube Quality Gate") {
         waitForQualityGate abortPipeline: true
     }
-*/
 
     stage('Terraform deploy') {
         dir('infra/terraform/app') {
