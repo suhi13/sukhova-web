@@ -26,7 +26,7 @@ node ('ec2-builder'){
     }
 
     stage('SonarQube analysis') {
-        def scannerHome = tool 'SonarScanner 4.0';
+        def scannerHome = tool 'sonar_scanner';
         dir('api') {
             withSonarQubeEnv() {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-api"
