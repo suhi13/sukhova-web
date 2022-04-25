@@ -9,7 +9,7 @@ node ('ec2-builder'){
     def awsRegion               = "eu-central-1"
     def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
     def imageTag                = "latest"
-    def vars = [
+    def varsMap = [
         image_tag: imageTag
     ]
     
@@ -42,7 +42,7 @@ node ('ec2-builder'){
 
     stage('Terraform deploy') {
         dir('infra/terraform/app') {
-            terraformPerform('apply', vars)
+            terraformPerform('apply', varsMap)
         }
     }
 
@@ -93,9 +93,9 @@ def checkoutRepository(repoUrl, branch) {
     ])
 }
 
-def terraformPerform(action, vars) {
+def terraformPerform(action, varsMap) {
     String vars = ""
-    ctxVars.each{itemKey,itemValue->
+    varsMap.each{itemKey,itemValue->
         vars = vars + " -var '${itemKey}=${itemValue}'"    
     }
     timeout(time: 1, unit: 'HOURS') {
