@@ -25,7 +25,6 @@ node ('ec2-builder'){
         }
     }
 
-/*
     stage('SonarQube analysis') {
         def scannerHome = tool 'SonarScanner 4.0';
         dir('api') {
@@ -35,6 +34,7 @@ node ('ec2-builder'){
         }
     }
 	
+/*
     stage("SonarQube Quality Gate") {
         waitForQualityGate abortPipeline: true
     }
