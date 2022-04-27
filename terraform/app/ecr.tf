@@ -16,3 +16,11 @@ resource "aws_ecr_repository" "frontend" {
       scan_on_push = true
   }
 }
+
+resource "aws_ecr_repository" "admin" {
+  name                 =  "${var.name_prefix}-admin"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration  {
+      scan_on_push = true
+  }
+}

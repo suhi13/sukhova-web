@@ -4,11 +4,13 @@ node ('ec2-builder'){
     //currentBuild.displayName = "#${BUILD_NUMBER}"
     def apiRepositoryUrl        = "https://github.com/shopizer-ecommerce/shopizer.git"
     def feRepositoryUrl         = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
+    def adminRepositoryUrl      = "https://github.com/shopizer-ecommerce/shopizer-admin.git"
     def terraformRepositoryUrl  = "https://github.com/suhi13/sukhova-web.git"
     def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
+    def nodeImage               = "node:16"
     def awsRegion               = "eu-central-1"
     def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
-    def imageTag                = env.BUILD_NUMBER
+    def imageTag                = "latest"
     def varsMap = [
         image_tag: imageTag
     ]
@@ -19,6 +21,9 @@ node ('ec2-builder'){
         }
         dir('fe') {
             checkoutRepository(feRepositoryUrl, 'main')
+        }
+        dir('admin') {
+            checkoutRepository(adminRepositoryUrl, 'main')
         }
         dir('infra') {
             checkoutRepository(terraformRepositoryUrl, 'development')
@@ -44,7 +49,7 @@ node ('ec2-builder'){
         waitForQualityGate abortPipeline: true
     }
     */
-    
+
     stage('Terraform deploy') {
         dir('infra/terraform/app') {
             terraformPerform('apply', varsMap)
@@ -73,9 +78,24 @@ node ('ec2-builder'){
         }
     }
 
+    stage('Build/Push Admin panel') {
+        def repositoryName  = "shopizer-admin"
+        def dockerImageName = "${dockerEcr}/${repositoryName}:${imageTag}"        
+        dir('admin'){
+            docker.image(nodeImage).inside() {
+                sh "npm install"
+                sh "ng build"
+            }   
+            def image = docker.build(dockerImageName, "./")
+            pushImage(image)
+        }
+    }
+
 /*
     stage('OWASP ZAP analysis') {
-        sh "docker run -t owasp/zap2docker-stable zap-baseline.py -t http://192.168.0.197 || true"
+        docker.image("owasp/zap2docker-stable").inside() {
+            sh "zap-baseline.py -t http://frontend.shopizer || true"
+        }
     }
 
     stage ('Generate BOM') {

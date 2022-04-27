@@ -118,6 +118,7 @@ module "task-definition-frontend" {
   source          = "cn-terraform/ecs-fargate-task-definition/aws"
   name_prefix     = "${var.name_prefix}-frontend"
   container_name  = "${var.name_prefix}-frontend"
+  map_environment = {"APP_BASE_URL":"http://api.${var.name_prefix}:8080"}
   port_mappings = [
     {
       "containerPort": 80,
@@ -216,7 +217,6 @@ resource "aws_ecs_service" api {
   }
   depends_on = [aws_lb_listener.https]
 }
-
 
 resource "aws_route53_record" api {
   zone_id = var.route53_zone_id
