@@ -17,7 +17,7 @@ module "serverless_jenkins" {
   efs_subnet_ids                  = module.vpc.private_subnets
   jenkins_controller_subnet_ids   = module.vpc.private_subnets
   alb_subnet_ids                  = module.vpc.public_subnets
-  alb_ingress_allow_cidrs         = ["${module.myip.address}/32"]
+  alb_ingress_allow_cidrs         = ["0.0.0.0/0"]
   alb_acm_certificate_arn         = var.alb_acm_certificate_arn
   route53_create_alias            = true
   route53_alias_name              = var.jenkins_dns_alias
