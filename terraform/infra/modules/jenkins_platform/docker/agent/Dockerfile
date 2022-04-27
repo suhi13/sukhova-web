@@ -1,4 +1,4 @@
-FROM jenkins/inbound-agent:latest
+FROM jenkins/inbound-agent:jdk11
 
 USER root
 RUN apt-get update && apt-get install -y docker.io \

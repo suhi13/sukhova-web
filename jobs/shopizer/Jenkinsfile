@@ -39,10 +39,12 @@ node ('ec2-builder'){
         }
     }
 	
+    /*
     stage("SonarQube Quality Gate") {
         waitForQualityGate abortPipeline: true
     }
-
+    */
+    
     stage('Terraform deploy') {
         dir('infra/terraform/app') {
             terraformPerform('apply', varsMap)

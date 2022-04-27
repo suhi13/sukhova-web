@@ -90,6 +90,14 @@ jenkins:
                 image: ${ec2builder_image}
                 label: "ec2-builder"
                 launchType: "EC2"
+                logDriver: "awslogs"
+                logDriverOptions:
+                - name: "awslogs-group"
+                  value: "${log_group}"
+                - name: "awslogs-region"
+                  value: "${cluster_region}"
+                - name: "awslogs-stream-prefix"
+                  value: "agent"
                 memory: 0
                 memoryReservation: 1000
                 mountPoints:
@@ -119,7 +127,7 @@ unclassified:
     installations:
     - credentialsId: "sonar_token"
       name: "SonarQube"
-      serverUrl: "http://infra.sonar:9000"
+      serverUrl: "http://sonar.infra:9000"
       triggers:
         skipScmCause: false
         skipUpstreamCause: false
