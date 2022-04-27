@@ -37,7 +37,7 @@ data "template_file" jenkins_configuration_def {
     jenkins_controller_port   = var.jenkins_controller_port
     jnlp_port                 = var.jenkins_jnlp_port
     agent_security_groups     = aws_security_group.jenkins_controller_security_group.id
-    execution_role_arn        = aws_iam_role.jenkins_slave_role.arn
+    execution_role_arn        = aws_iam_role.ecs_execution_role.arn
     subnets                   = join(",", var.jenkins_controller_subnet_ids)
     ec2builder_image          = aws_ecr_repository.jenkins_agent.repository_url
     ec2_capacity_provider     = aws_ecs_capacity_provider.jenkins_slave_ec2_provider.name

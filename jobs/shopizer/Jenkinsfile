@@ -84,7 +84,7 @@ node ('ec2-builder'){
         dir('admin'){
             docker.image(nodeImage).inside() {
                 sh "npm install"
-                sh "ng build"
+                sh "./node_modules/@angular/cli/bin/ng build"
             }   
             def image = docker.build(dockerImageName, "./")
             pushImage(image)
