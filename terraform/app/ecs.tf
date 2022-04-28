@@ -118,7 +118,7 @@ module "task-definition-frontend" {
   source          = "cn-terraform/ecs-fargate-task-definition/aws"
   name_prefix     = "${var.name_prefix}-frontend"
   container_name  = "${var.name_prefix}-frontend"
-  map_environment = {"APP_BASE_URL":"http://api.${var.name_prefix}:8080"}
+  map_environment = {"APP_BASE_URL":"https://shopizer-api.rootin.cc"}
   port_mappings = [
     {
       "containerPort": 80,

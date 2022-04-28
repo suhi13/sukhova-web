@@ -91,21 +91,20 @@ node ('ec2-builder'){
         }
     }
 
-/*
     stage('OWASP ZAP analysis') {
         docker.image("owasp/zap2docker-stable").inside() {
-            sh "zap-baseline.py -t http://frontend.shopizer || true"
+            sh "zap-baseline.py -t http://shopizer.rootin.cc || true"
         }
     }
 
-    stage ('Generate BOM') {
-        sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeBom'
+    stage ('OWASP Dependency-Check') {
+        dependencyCheck additionalArguments: ''' 
+            -o "./" 
+            -s "./api"
+            -f "ALL" 
+            --prettyPrint''', odcInstallation: 'OWASP-DC'
+        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
     }
-
-    stage ('Dependency Tracker') {
-        dependencyTrackPublisher artifact: 'target/bom.xml', projectId: '9812e933-6bc1-4453-951f-9a75a7d693b5', synchronous: true
-    }
-*/    
 }
 
 def checkoutRepository(repoUrl, branch) {
