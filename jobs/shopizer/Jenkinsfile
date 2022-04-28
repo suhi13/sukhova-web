@@ -7,7 +7,7 @@ node ('ec2-builder'){
     def adminRepositoryUrl      = "https://github.com/shopizer-ecommerce/shopizer-admin.git"
     def terraformRepositoryUrl  = "https://github.com/suhi13/sukhova-web.git"
     def mavenImage              = "maven:3.8.1-adoptopenjdk-11"
-    def nodeImage               = "node:12"
+    def nodeImage               = "node:12.22.7"
     def awsRegion               = "eu-central-1"
     def dockerEcr               = "623550112002.dkr.ecr.${awsRegion}.amazonaws.com"
     def imageTag                = "latest"
@@ -83,8 +83,9 @@ node ('ec2-builder'){
         def dockerImageName = "${dockerEcr}/${repositoryName}:${imageTag}"        
         dir('admin'){
             docker.image(nodeImage).inside() {
+                sh "rm package-lock.json"
                 sh "npm install"
-                sh "./node_modules/@angular/cli/bin/ng build"
+                sh "./node_modules/@angular/cli/bin/ng build --prod"
             }   
             def image = docker.build(dockerImageName, "./")
             pushImage(image)
@@ -105,6 +106,12 @@ node ('ec2-builder'){
             --prettyPrint''', odcInstallation: 'OWASP-DC'
         dependencyCheckPublisher pattern: 'dependency-check-report.xml'
     }
+/*
+  stage('Contrast Security Verification'){
+    contrastAgent profile:'Main', outputDirectory: env.WORKSPACE, agentType: 'Java'
+    contrastVerification applicationName: 'shopizer', agentType: 'Java', count: 1, profile: 'Main', queryBy: 3, rule: 'cache-controls-missing', severity: 'High'
+  }
+*/
 }
 
 def checkoutRepository(repoUrl, branch) {
