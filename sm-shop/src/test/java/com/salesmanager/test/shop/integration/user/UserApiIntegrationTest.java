@@ -75,7 +75,6 @@ public class UserApiIntegrationTest extends ServicesTestSupport {
       
       String oldPassword = CREATED_PASSWORD;
       String newPassword = NEW_CREATED_PASSWORD;
-      String repeatPassword = newPassword;
       
       UserPassword userPassword = new UserPassword();
       userPassword.setPassword(oldPassword);
@@ -83,17 +82,11 @@ public class UserApiIntegrationTest extends ServicesTestSupport {
       
       final HttpEntity<UserPassword> changePasswordEntity = new HttpEntity<UserPassword>(userPassword, getHeader());
 
-      
       final ResponseEntity<Void> changePassword = testRestTemplate.exchange(String.format("/api/v1/private/user/" + user.getId() + "/password"), HttpMethod.PATCH, changePasswordEntity, Void.class);
       if (changePassword.getStatusCode() != HttpStatus.OK) {
           throw new Exception(response.toString());
       } else {
         assertNotNull("Password changed"); 
       }
-      
-      
   }
-  
-
-
 }
