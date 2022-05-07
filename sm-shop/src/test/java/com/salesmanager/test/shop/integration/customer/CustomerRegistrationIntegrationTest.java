@@ -80,6 +80,6 @@ public class CustomerRegistrationIntegrationTest extends ServicesTestSupport {
         final ResponseEntity<AuthenticationResponse> loginResponse = testRestTemplate.postForEntity("/api/v1/customer/login",
                 new HttpEntity<>(new AuthenticationRequest(email, "clear123")), AuthenticationResponse.class);
 
-        Assert.assertFalse("Response code is 200 OK", loginResponse.getStatusCode().toString().contains("200 OK"));
+        Assert.assertTrue(loginResponse.getStatusCode().toString().contains("200 OK"));
     }
 }
