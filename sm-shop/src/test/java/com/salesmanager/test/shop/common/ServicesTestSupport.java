@@ -13,30 +13,23 @@ import com.salesmanager.shop.model.catalog.product.ProductSpecification;
 import com.salesmanager.shop.model.catalog.product.ReadableProduct;
 import com.salesmanager.shop.model.shoppingcart.PersistableShoppingCartItem;
 import com.salesmanager.shop.model.shoppingcart.ReadableShoppingCart;
-import com.salesmanager.shop.model.store.ReadableMerchantStore;
-import com.salesmanager.shop.populator.customer.ReadableCustomerList;
 import com.salesmanager.shop.store.security.AuthenticationRequest;
 import com.salesmanager.shop.store.security.AuthenticationResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -52,26 +45,12 @@ public class ServicesTestSupport {
     }
 
     protected HttpHeaders getHeader(final String userName, final String password) {
-        final ResponseEntity<AuthenticationResponse> response = testRestTemplate.postForEntity("/api/v1/private/login", new HttpEntity<>(new AuthenticationRequest(userName, password)),
-                AuthenticationResponse.class);
+        final ResponseEntity<AuthenticationResponse> response = testRestTemplate.postForEntity("/api/v1/private/login",
+                new HttpEntity<>(new AuthenticationRequest(userName, password)), AuthenticationResponse.class);
         final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-        headers.add("Authorization", "Bearer " + response.getBody().getToken());
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+        headers.add("Authorization", "Bearer " + Objects.requireNonNull(response.getBody()).getToken());
         return headers;
-    }
-
-    public ReadableMerchantStore fetchStore() {
-        final HttpEntity<String> httpEntity = new HttpEntity<>(getHeader());
-        return testRestTemplate.exchange(String.format("/api/v1/store/%s", Constants.DEFAULT_STORE), HttpMethod.GET,
-                httpEntity, ReadableMerchantStore.class).getBody();
-
-    }
-
-    public ReadableCustomerList fetchCustomers() {
-        final HttpEntity<String> httpEntity = new HttpEntity<>(getHeader());
-        return testRestTemplate.exchange("/api/v1/private/customers", HttpMethod.GET,
-                httpEntity, ReadableCustomerList.class).getBody();
-
     }
 
     protected PersistableManufacturer manufacturer(String code) {
@@ -87,23 +66,19 @@ public class ServicesTestSupport {
       m.getDescriptions().add(desc);
 
       return m;
-
-
     }
 
-    protected PersistableCategory category(String code) {
+    protected PersistableCategory category() {
 
       PersistableCategory newCategory = new PersistableCategory();
-      newCategory.setCode(code);
+      newCategory.setCode("TEST");
       newCategory.setSortOrder(1);
       newCategory.setVisible(true);
       newCategory.setDepth(1);
 
-
       CategoryDescription description = new CategoryDescription();
       description.setLanguage("en");
-      description.setName(code);
-
+      description.setName("TEST");
 
       List<CategoryDescription> descriptions = new ArrayList<>();
       descriptions.add(description);
@@ -111,12 +86,9 @@ public class ServicesTestSupport {
       newCategory.setDescriptions(descriptions);
 
       return newCategory;
-
-
     }
 
     protected PersistableProduct product(String code) {
-
 
       PersistableProduct product = new PersistableProduct();
 
@@ -130,7 +102,6 @@ public class ServicesTestSupport {
       product.getDescriptions().add(description);
 
       return product;
-
     }
 
     protected ReadableProduct sampleProduct(String code) {
@@ -161,8 +132,8 @@ public class ServicesTestSupport {
         final ResponseEntity<PersistableCategory> categoryResponse = testRestTemplate.postForEntity("/api/v1/private/category?store=" + Constants.DEFAULT_STORE, categoryEntity,
                 PersistableCategory.class);
         final PersistableCategory cat = categoryResponse.getBody();
-        assertThat(categoryResponse.getStatusCode(), is(CREATED));
-        assertNotNull(cat.getId());
+        Assertions.assertEquals(CREATED, categoryResponse.getStatusCode());
+        Assertions.assertNotNull(Objects.requireNonNull(cat).getId());
 
         final PersistableProduct product = new PersistableProduct();
         final ArrayList<Category> categories = new ArrayList<>();
@@ -181,40 +152,40 @@ public class ServicesTestSupport {
         productDescription.setLanguage("en");
         product.getDescriptions().add(productDescription);
 
-
         final HttpEntity<PersistableProduct> entity = new HttpEntity<>(product, getHeader());
 
-        final ResponseEntity<PersistableProduct> response = testRestTemplate.postForEntity("/api/v1/private/product?store=" + Constants.DEFAULT_STORE, entity, PersistableProduct.class);
-        assertThat(response.getStatusCode(), is(CREATED));
+        final ResponseEntity<PersistableProduct> response =
+                testRestTemplate.postForEntity("/api/v1/private/product?store=" + Constants.DEFAULT_STORE, entity,
+                        PersistableProduct.class);
+        Assertions.assertEquals(CREATED, response.getStatusCode());
 
         final HttpEntity<String> httpEntity = new HttpEntity<>(getHeader());
 
-        String apiUrl = "/api/v1/products/" + response.getBody().getId();
+        String apiUrl = "/api/v1/products/" + Objects.requireNonNull(response.getBody()).getId();
 
-        ResponseEntity<ReadableProduct> readableProduct = testRestTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity, ReadableProduct.class);
-        assertThat(readableProduct.getStatusCode(), is(OK));
+        ResponseEntity<ReadableProduct> readableProduct = testRestTemplate.exchange(apiUrl, HttpMethod.GET, httpEntity,
+                ReadableProduct.class);
+        Assertions.assertEquals(OK, readableProduct.getStatusCode());
 
         return readableProduct.getBody();
     }
 
     protected ReadableShoppingCart sampleCart() {
 
-
     	ReadableProduct product = sampleProduct("sampleCart");
-    	assertNotNull(product);
+    	Assertions.assertNotNull(product);
 
         PersistableShoppingCartItem cartItem = new PersistableShoppingCartItem();
         cartItem.setProduct(product.getId());
         cartItem.setQuantity(1);
 
         final HttpEntity<PersistableShoppingCartItem> cartEntity = new HttpEntity<>(cartItem, getHeader());
-        final ResponseEntity<ReadableShoppingCart> response = testRestTemplate.postForEntity(String.format("/api/v1/cart/"), cartEntity, ReadableShoppingCart.class);
+        final ResponseEntity<ReadableShoppingCart> response = testRestTemplate.postForEntity("/api/v1/cart/", 
+                cartEntity, ReadableShoppingCart.class);
 
-        assertNotNull(response);
-        assertThat(response.getStatusCode(), is(CREATED));
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals(CREATED, response.getStatusCode());
 
     	return response.getBody();
     }
-
-
 }

@@ -359,7 +359,7 @@ public class CategoryManagementAPIIntegrationTest extends ServicesTestSupport {
       assertThat(response.getStatusCode(), is(CREATED));
       
       //create category
-      PersistableCategory category = super.category("TEST");
+      PersistableCategory category = super.category();
       Category cat = new Category();//to be used in product
       cat.setCode("TEST");
       
