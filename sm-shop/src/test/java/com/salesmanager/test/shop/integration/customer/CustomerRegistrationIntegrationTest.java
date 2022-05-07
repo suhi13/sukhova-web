@@ -10,17 +10,16 @@ import com.salesmanager.shop.store.security.AuthenticationResponse;
 import com.salesmanager.test.shop.common.ServicesTestSupport;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.HttpStatus.OK;
+import java.util.Objects;
 
 @SpringBootTest(classes = ShopApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -44,13 +43,15 @@ public class CustomerRegistrationIntegrationTest extends ServicesTestSupport {
         final ResponseEntity<PersistableCustomer> response =
                 testRestTemplate.postForEntity("/api/v1/customer/register",
                         entity, PersistableCustomer.class);
-        Assert.assertEquals(response.getStatusCode(), equalTo(OK));
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 
-        // created customer can login
+        // created customer can log in
         final ResponseEntity<AuthenticationResponse> loginResponse =
-                testRestTemplate.postForEntity("/api/v1/customer/login", new HttpEntity<>(new AuthenticationRequest("customer1@test.com", "clear123")), AuthenticationResponse.class);
-        Assert.assertEquals(loginResponse.getStatusCode(), is(OK));
-        assertNotNull(loginResponse.getBody().getToken());
+                testRestTemplate.postForEntity("/api/v1/customer/login",
+                        new HttpEntity<>(new AuthenticationRequest("customer1@test.com", "clear123")),
+                        AuthenticationResponse.class);
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assert.assertNotNull(Objects.requireNonNull(loginResponse.getBody()).getToken());
 
     }
     @Test
@@ -73,12 +74,12 @@ public class CustomerRegistrationIntegrationTest extends ServicesTestSupport {
         final ResponseEntity<PersistableCustomer> response =
                 testRestTemplate.postForEntity("/api/v1/customer/register",
                         entity, PersistableCustomer.class);
-        Assert.assertEquals(response.getStatusCode(), is(OK));
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
 
         // created customer can log in
         final ResponseEntity<AuthenticationResponse> loginResponse = testRestTemplate.postForEntity("/api/v1/customer/login",
                 new HttpEntity<>(new AuthenticationRequest(email, "clear123")), AuthenticationResponse.class);
 
-        Assert.assertTrue("Response code is 200 OK", !loginResponse.getStatusCode().toString().contains("200 OK"));
+        Assert.assertFalse("Response code is 200 OK", loginResponse.getStatusCode().toString().contains("200 OK"));
     }
 }
