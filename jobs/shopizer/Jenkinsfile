@@ -2,7 +2,7 @@
 
 node ('ec2-builder'){
     //currentBuild.displayName = "#${BUILD_NUMBER}"
-    def apiRepositoryUrl        = "https://github.com/shopizer-ecommerce/shopizer.git"
+    def apiRepositoryUrl        = "https://github.com/suhi13/sukhova-web.git"
     def feRepositoryUrl         = "https://github.com/shopizer-ecommerce/shopizer-shop-reactjs.git"
     def adminRepositoryUrl      = "https://github.com/shopizer-ecommerce/shopizer-admin.git"
     def terraformRepositoryUrl  = "https://github.com/suhi13/sukhova-web.git"
@@ -73,7 +73,9 @@ node ('ec2-builder'){
             docker.image(mavenImage).inside() {
                 sh "mvn clean install"
             }
+            // Inject Contrast Security
             withCredentials([file(credentialsId: 'contrast_security', variable: 'FILE')]) {
+                contrastAgent outputDirectory: env.WORKSPACE, agentType: 'Java'
                 def image = docker.build(dockerImageName, "./sm-shop")
             }
             pushImage(image)
@@ -82,10 +84,8 @@ node ('ec2-builder'){
 
 /*
     stage('Contrast Security Verification'){
-        contrastAgent profile:'Main', outputDirectory: env.WORKSPACE, agentType: 'Java'
+        contrastAgent outputDirectory: env.WORKSPACE, agentType: 'Java'
         sh 'nohup java -javaagent:./contrast.jar -Dcontrast.server=https://ce.contrastsecurity.com/Contrast -Dcontrast.override.appversion=${JOB_NAME}-${BUILD_NUMBER} -Dcontrast.application.session_metadata="buildNumber=${BUILD_NUMBER}" -Dcontrast.standalone.appname=shopizer -Dserver.port=8080 -jar ${WORKSPACE}/api/sm-shop/target/shopizer.jar&'
-        //sh 'sleep 75'
-        //contrastVerification applicationName: 'shopizer', agentType: 'Java', count: 0, profile: 'Main', queryBy: 3, severity: 'High'
     }
 */
     stage('Build/Push Frontend') {
