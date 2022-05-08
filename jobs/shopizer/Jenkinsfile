@@ -72,12 +72,22 @@ node ('ec2-builder'){
         dir('api'){
             docker.image(mavenImage).inside() {
                 sh "mvn clean install"
-            }   
-            def image = docker.build(dockerImageName, "./sm-shop")
+            }
+            withCredentials([file(credentialsId: 'contrast_security', variable: 'FILE')]) {
+                def image = docker.build(dockerImageName, "./sm-shop")
+            }
             pushImage(image)
         }
     }
 
+/*
+    stage('Contrast Security Verification'){
+        contrastAgent profile:'Main', outputDirectory: env.WORKSPACE, agentType: 'Java'
+        sh 'nohup java -javaagent:./contrast.jar -Dcontrast.server=https://ce.contrastsecurity.com/Contrast -Dcontrast.override.appversion=${JOB_NAME}-${BUILD_NUMBER} -Dcontrast.application.session_metadata="buildNumber=${BUILD_NUMBER}" -Dcontrast.standalone.appname=shopizer -Dserver.port=8080 -jar ${WORKSPACE}/api/sm-shop/target/shopizer.jar&'
+        //sh 'sleep 75'
+        //contrastVerification applicationName: 'shopizer', agentType: 'Java', count: 0, profile: 'Main', queryBy: 3, severity: 'High'
+    }
+*/
     stage('Build/Push Frontend') {
         def repositoryName  = "shopizer-frontend"
         def dockerImageName = "${dockerEcr}/${repositoryName}:${imageTag}"        
@@ -106,13 +116,6 @@ node ('ec2-builder'){
             sh "zap-baseline.py -t http://shopizer.rootin.cc || true"
         }
     }
-
-/*
-  stage('Contrast Security Verification'){
-    contrastAgent profile:'Main', outputDirectory: env.WORKSPACE, agentType: 'Java'
-    contrastVerification applicationName: 'shopizer', agentType: 'Java', count: 1, profile: 'Main', queryBy: 3, rule: 'cache-controls-missing', severity: 'High'
-  }
-*/
 }
 
 def checkoutRepository(repoUrl, branch) {
