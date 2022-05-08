@@ -140,6 +140,14 @@ credentials:
           scope: GLOBAL
           secret: "{AQAAABAAAAAwjng==}"
 tool:
+  dependency-check:
+    installations:
+    - name: "OWASP-DC"
+      properties:
+      - installSource:
+          installers:
+          - dependencyCheckInstaller:
+              id: "7.1.0"
   sonarRunnerInstallation:
     installations:
     - name: "sonar_scanner"
