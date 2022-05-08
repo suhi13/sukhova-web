@@ -43,7 +43,16 @@ node ('ec2-builder'){
             }
         }
     }
-	
+
+    stage ('OWASP Dependency-Check') {
+        dependencyCheck additionalArguments: ''' 
+            -o "./" 
+            -s "./api"
+            -f "ALL" 
+            --prettyPrint''', odcInstallation: 'OWASP-DC'
+        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+    }
+
     /*
     stage("SonarQube Quality Gate") {
         waitForQualityGate abortPipeline: true
@@ -98,14 +107,6 @@ node ('ec2-builder'){
         }
     }
 
-    stage ('OWASP Dependency-Check') {
-        dependencyCheck additionalArguments: ''' 
-            -o "./" 
-            -s "./api"
-            -f "ALL" 
-            --prettyPrint''', odcInstallation: 'OWASP-DC'
-        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-    }
 /*
   stage('Contrast Security Verification'){
     contrastAgent profile:'Main', outputDirectory: env.WORKSPACE, agentType: 'Java'
