@@ -76,7 +76,7 @@ node ('ec2-builder'){
             // Inject Contrast Security
             dir('sm-shop') {
                 withCredentials([file(credentialsId: 'contrast_security', variable: 'FILE')]) {
-                    contrastAgent agentType: 'Java'
+                    contrastAgent profile: 'Main', agentType: 'Java'
                     def image = docker.build(dockerImageName, "./")
                 }
             }
