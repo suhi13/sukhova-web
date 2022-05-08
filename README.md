@@ -1,3 +1,3 @@
 # sukhova-web project
-Main data
+main data
 
