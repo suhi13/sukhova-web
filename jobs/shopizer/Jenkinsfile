@@ -74,9 +74,11 @@ node ('ec2-builder'){
                 sh "mvn clean install"
             }
             // Inject Contrast Security
-            withCredentials([file(credentialsId: 'contrast_security', variable: 'FILE')]) {
-                contrastAgent outputDirectory: env.WORKSPACE, agentType: 'Java'
-                def image = docker.build(dockerImageName, "./sm-shop")
+            dir('sm-shop') {
+                withCredentials([file(credentialsId: 'contrast_security', variable: 'FILE')]) {
+                    contrastAgent agentType: 'Java'
+                    def image = docker.build(dockerImageName, "./")
+                }
             }
             pushImage(image)
         }
