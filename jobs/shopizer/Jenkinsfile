@@ -86,6 +86,8 @@ node ('ec2-builder'){
                     def image = docker.build(dockerImageName, "./")
                     pushImage(image)
                 }
+                // Reporting
+                junit '**/target/surefire-reports/*.xml'
             }
         }
     }
