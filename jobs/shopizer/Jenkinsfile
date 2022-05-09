@@ -121,7 +121,7 @@ node ('ec2-builder'){
 
     stage('OWASP ZAP analysis') {
         docker.image("owasp/zap2docker-stable").inside("-v $WORKSPACE:/zap/wrk/:rw") {
-            sh "zap-baseline.py -t https://shopizer.rootin.cc -r index.html || true"
+            sh "zap-full-scan.py -t https://shopizer.rootin.cc -r index.html || true"
             sh "cp -f /zap/wrk/index.html ./zap_report.html"
         }
         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: '', reportFiles: 'zap_report.html', reportName: 'ZAP Scan', reportTitles: 'ZAP Full Scan'])
