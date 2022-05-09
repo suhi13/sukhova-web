@@ -79,9 +79,9 @@ node ('ec2-builder'){
                     sh "cp -f $FILE ."
                     sh "curl -L 'https://repository.sonatype.org/service/local/artifact/maven/redirect?r=central-proxy&g=com.contrastsecurity&a=contrast-agent&v=LATEST' -o contrast.jar"
                     def image = docker.build(dockerImageName, "./")
+                    pushImage(image)
                 }
             }
-            pushImage(image)
         }
     }
 
