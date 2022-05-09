@@ -42,6 +42,11 @@ node ('ec2-builder'){
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-frontend"
             }
         }
+        dir('admin') {
+            withSonarQubeEnv('SonarQube') {
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=shopizer-admin"
+            }
+        }
     }
 
     stage ('OWASP Dependency-Check') {
