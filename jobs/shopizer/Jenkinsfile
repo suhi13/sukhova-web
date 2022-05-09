@@ -16,6 +16,7 @@ node ('ec2-builder'){
     ]
     
     stage('Git checkout') {
+        cleanWs()
         dir('api') {
             checkoutRepository(apiRepositoryUrl, 'master')
         }
@@ -87,7 +88,7 @@ node ('ec2-builder'){
                     pushImage(image)
                 }
                 // Reporting
-                junit '**/target/surefire-reports/*.xml'
+                junit testResults: '**/target/surefire-reports/*.xml', skipPublishingChecks: true
             }
         }
     }
